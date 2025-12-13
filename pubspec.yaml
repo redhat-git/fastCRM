@@ -1,0 +1,31 @@
+name: fast_crm
+description: "A new Flutter project."
+publish_to: 'none' 
+
+environment:
+  sdk: ^3.0.0 # J'ai élargi la compatibilité pour éviter des erreurs de version SDK
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Icônes style iOS (standard Flutter)
+  cupertino_icons: ^1.0.8
+  
+  # Librairie pour les graphiques (le camembert)
+  fl_chart: ^1.1.0
+
+dependency_overrides:
+  vector_math: ^2.1.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  
+  # Déclaration des images
+  assets:
+    - assets/

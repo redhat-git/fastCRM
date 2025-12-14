@@ -1,5 +1,5 @@
 name: fast_crm
-description: "A new Flutter project."
+description: "Projet de gestion de client (L3 - GI)" #j'ai mis une bonne description
 publish_to: 'none' 
 
 environment:
@@ -8,6 +8,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  sqflite: ^2.3.0
+  path: ^1.9.0
+  crypto: ^3.0.3
+
 
   # Icônes style iOS (standard Flutter)
   cupertino_icons: ^1.0.8

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+// Les imports vers le dossier AUTH (remonter d'un niveau ../)
 import '../auth/signup_page.dart';
 import '../auth/login_page.dart';
 
@@ -7,14 +8,13 @@ class WelcomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Hauteur de l'écran
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFD6C0A6), // Beige un peu plus foncé du haut
+      backgroundColor: const Color(0xFFD6C0A6), // Beige foncé haut
       body: Stack(
         children: [
-          // Logo en haut
+          // Logo en haut (Positionné à 25% de la hauteur)
           Positioned(
             top: size.height * 0.25,
             left: 0,
@@ -25,7 +25,7 @@ class WelcomePage extends StatelessWidget {
                 width: 150,
                 decoration: const BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage('assets/logo.png'), // Votre logo
+                    image: AssetImage('assets/logo.png'),
                     fit: BoxFit.contain,
                   ),
                 ),
@@ -33,16 +33,16 @@ class WelcomePage extends StatelessWidget {
             ),
           ),
           
-          // La partie basse beige clair avec la courbe
+          // Partie basse beige clair (Courbée)
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
-            height: size.height * 0.55,
+            height: size.height * 0.55, // Prend 55% du bas
             child: Container(
               padding: const EdgeInsets.all(30),
               decoration: const BoxDecoration(
-                color: Color(0xFFEDE2D0), // Beige clair
+                color: Color(0xFFEDE2D0), // Beige clair bas
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(50),
                   topRight: Radius.circular(50),
@@ -67,9 +67,10 @@ class WelcomePage extends StatelessWidget {
                   ),
                   const Spacer(),
                   
-                  // Les deux boutons côte à côte
+                  // BOUTONS CÔTE À CÔTE
                   Row(
                     children: [
+                      // Bouton Inscription
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SignupPage())),
@@ -84,6 +85,7 @@ class WelcomePage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 15),
+                      // Bouton Connexion
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginPage())),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../main_screen.dart';
+import '../main_screen.dart'; // Assurez-vous que ce fichier existe à la racine de views
 import 'signup_page.dart';
 
 class LoginPage extends StatelessWidget {
@@ -7,10 +7,10 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // On récupère la taille de l'écran
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFE8D6BF), // Couleur beige du thème
       body: SingleChildScrollView(
         child: Container(
           height: size.height,
@@ -25,13 +25,13 @@ class LoginPage extends StatelessWidget {
                 height: 150,
                 decoration: const BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage('assets/logo.jpg'), 
+                    image: AssetImage('assets/logo.png'), // Vérifiez que ce fichier existe
                     fit: BoxFit.contain,
                   ),
                 ),
               ),
               const SizedBox(height: 40),
-              
+
               // Texte de bienvenue
               Text(
                 "Bienvenue sur Fast CRM",
@@ -65,27 +65,29 @@ class LoginPage extends StatelessWidget {
                   prefixIcon: Icon(Icons.lock_outline),
                 ),
               ),
-              
+
               const SizedBox(height: 40),
-              
-              // BOUTON
+
+              // BOUTON SE CONNECTER
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pushReplacement(
-                      context, MaterialPageRoute(builder: (_) => const MainScreen()));
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (_) => const MainScreen()));
                 },
                 child: const Text("SE CONNECTER"),
               ),
-              
+
               const Spacer(),
-              
+
               // LIEN INSCRIPTION
               TextButton(
-                onPressed: () => Navigator.push(
-                    context, MaterialPageRoute(builder: (_) => const SignupPage())),
+                onPressed: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const SignupPage())),
                 child: Text(
                   "Créer un nouveau compte",
-                  style: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
             ],

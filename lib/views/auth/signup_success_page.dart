@@ -3,9 +3,9 @@ import 'pin_code_page.dart';
 
 class SignupSuccessPage extends StatelessWidget {
   final String name;
-  final bool hasPhoto; // <-- NOUVEAU
+  final bool hasPhoto;
 
-  const SignupSuccessPage({super.key, required this.name, required this.hasPhoto}); // <-- NOUVEAU
+  const SignupSuccessPage({super.key, required this.name, required this.hasPhoto});
 
   @override
   Widget build(BuildContext context) {
@@ -30,15 +30,14 @@ class SignupSuccessPage extends StatelessWidget {
               ),
               const SizedBox(height: 50),
 
-              // Illustration (Grande bulle avec la photo)
+              // ILLUSTRATION
               Container(
                 width: 200, height: 200,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.6),
                   shape: BoxShape.circle,
-                  // Affichage conditionnel de l'image
                   image: hasPhoto 
-                      ? const DecorationImage(image: AssetImage('assets/logo.jpg'), fit: BoxFit.cover)
+                      ? const DecorationImage(image: AssetImage('assets/logo.png'), fit: BoxFit.cover)
                       : null
                 ),
                 child: hasPhoto 
@@ -52,10 +51,9 @@ class SignupSuccessPage extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    // C'EST ICI : On transmet le nom à la page PIN
+                    // Passage à la configuration du PIN
                     Navigator.push(context, MaterialPageRoute(builder: (_) => PinCodePage(userName: name)));
                   },
-                  
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black,

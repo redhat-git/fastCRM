@@ -5,21 +5,20 @@ class SignupConfirmPage extends StatelessWidget {
   final String name;
   final String email;
   final String phone;
-  final bool hasPhoto; // <-- NOUVEAU
+  final bool hasPhoto;
 
   const SignupConfirmPage({
     super.key, 
     required this.name, 
     required this.email, 
     required this.phone,
-    required this.hasPhoto, // <-- NOUVEAU
+    required this.hasPhoto,
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE6D6C4),
-      // ... AppBar identique ...
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -30,22 +29,20 @@ class SignupConfirmPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ... Textes identiques ...
             const Text("Finalisation", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
             const Text("Veuillez vérifier vos informations, puis confirmer pour terminer la création de votre compte.", style: TextStyle(fontSize: 16, color: Colors.black54)),
             const SizedBox(height: 40),
 
-            // Avatar qui affiche la photo si elle existe
+            // RAPPEL AVATAR
             Center(
               child: Container(
                 width: 100, height: 100,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.5), 
                   shape: BoxShape.circle,
-                  // Affichage conditionnel de l'image
                   image: hasPhoto 
-                      ? const DecorationImage(image: AssetImage('assets/logo.jpg'), fit: BoxFit.cover)
+                      ? const DecorationImage(image: AssetImage('assets/logo.png'), fit: BoxFit.cover)
                       : null
                 ),
                 child: hasPhoto 
@@ -55,7 +52,7 @@ class SignupConfirmPage extends StatelessWidget {
             ),
             const SizedBox(height: 40),
 
-            // ... Cartes info identiques ...
+            // INFO CARDS
             _infoCard(name.isEmpty ? "Nom inconnu" : name),
             const SizedBox(height: 15),
             _infoCard(email.isEmpty ? "Email inconnu" : email),
@@ -64,17 +61,16 @@ class SignupConfirmPage extends StatelessWidget {
 
             const Spacer(),
 
+            // BOUTON CONFIRMER
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  // On transmet le nom et la photo à la page de succès
                   Navigator.push(context, MaterialPageRoute(builder: (_) => SignupSuccessPage(
                     name: name,
-                    hasPhoto: hasPhoto // <-- NOUVEAU
+                    hasPhoto: hasPhoto
                   )));
                 },
-                // ... Style bouton identique ...
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.black,
@@ -90,13 +86,13 @@ class SignupConfirmPage extends StatelessWidget {
       ),
     );
   }
-  // ... _infoCard reste pareil ...
-    Widget _infoCard(String text) {
+
+  Widget _infoCard(String text) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 24),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.6), // Fond sombre comme sur la maquette
+        color: Colors.black.withOpacity(0.6),
         borderRadius: BorderRadius.circular(30),
       ),
       child: Text(

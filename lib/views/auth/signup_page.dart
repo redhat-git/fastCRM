@@ -13,7 +13,6 @@ class _SignupPageState extends State<SignupPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
 
-  // Variable pour savoir si une photo est simulée
   bool _hasSelectedPhoto = false;
 
   @override
@@ -40,11 +39,10 @@ class _SignupPageState extends State<SignupPage> {
                 style: TextStyle(fontSize: 16, color: Colors.black54)),
             const SizedBox(height: 30),
 
-            // Avatar (Cliquable)
+            // SÉLECTION PHOTO (Simulation)
             Center(
               child: GestureDetector(
                 onTap: () {
-                  // Simulation : On clique, la photo est "choisie"
                   setState(() => _hasSelectedPhoto = true);
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                       content: Text("Photo sélectionnée !"),
@@ -60,23 +58,21 @@ class _SignupPageState extends State<SignupPage> {
                         color: Colors.white.withOpacity(0.5),
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white, width: 2),
-                        // Si une photo est choisie, on affiche une image (placeholder ou réelle)
                         image: _hasSelectedPhoto
                             ? const DecorationImage(
-                                image: AssetImage('assets/logo.png'),
-                                fit: BoxFit
-                                    .cover) // On utilise le logo comme exemple de photo
+                                image: AssetImage('assets/logo.png'), // Photo simulée
+                                fit: BoxFit.cover)
                             : null,
                       ),
                       child: _hasSelectedPhoto
-                          ? null // Plus d'icône si photo
+                          ? null
                           : const Icon(Icons.person_outline,
                               size: 50, color: Colors.black54),
                     ),
                     CircleAvatar(
                       backgroundColor: _hasSelectedPhoto
                           ? Colors.green
-                          : Colors.black, // Change de couleur si sélectionné
+                          : Colors.black,
                       radius: 15,
                       child: Icon(_hasSelectedPhoto ? Icons.check : Icons.add,
                           color: Colors.white, size: 18),
@@ -86,6 +82,7 @@ class _SignupPageState extends State<SignupPage> {
               ),
             ),
             const SizedBox(height: 30),
+            
             _buildTextField("Nom d’utilisateur", _nameController),
             const SizedBox(height: 20),
             _buildTextField("Adresse e-mail", _emailController),
@@ -97,7 +94,7 @@ class _SignupPageState extends State<SignupPage> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  // On transmet l'info de la photo (true/false)
+                  // Navigation vers confirmation
                   Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -105,17 +102,16 @@ class _SignupPageState extends State<SignupPage> {
                                 name: _nameController.text,
                                 email: _emailController.text,
                                 phone: _phoneController.text,
-                                hasPhoto: _hasSelectedPhoto, // <-- NOUVEAU
+                                hasPhoto: _hasSelectedPhoto,
                               )));
                 },
-                // ... style du bouton ...
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
+                  backgroundColor: Colors.black, // Bouton noir spécifique à cette page
                   padding: const EdgeInsets.symmetric(vertical: 18),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30)),
                 ),
-                child: const Text("S’ inscrire",
+                child: const Text("S’inscrire",
                     style: TextStyle(
                         fontSize: 18,
                         color: Colors.white,
@@ -129,7 +125,6 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 
-  // ... _buildTextField reste pareil ...
   Widget _buildTextField(String hint, TextEditingController controller) {
     return TextField(
       controller: controller,

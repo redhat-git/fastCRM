@@ -1,11 +1,11 @@
+//gestionnaire.dart
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
-import 'package:fast_crm/models/clientModel.dart';
-import 'package:fast_crm/models/historiqueModel.dart';
+import 'package:fast_crm/models/client_model.dart';
+import 'package:fast_crm/models/history_model.dart';
 import '../database/database_helper.dart';
 
 class Gestionnaire {
-
   static final DatabaseHelper _dbHelper = DatabaseHelper.instance;
 
   static String _hashMdp(String mdp) {
@@ -37,13 +37,11 @@ class Gestionnaire {
     final db = await _dbHelper.database;
     final mdpHash = _hashMdp(mdp);
 
-    final result = await db.rawQuery(
-      '''
+    final result = await db.rawQuery('''
       SELECT mdp
       FROM gestionnaires
       LIMIT 1
-      '''
-    );
+      ''');
 
     if (result.isEmpty) {
       return false;
@@ -65,7 +63,6 @@ class Gestionnaire {
     required String statut,
     required String contact,
   }) async {
-
     if (nom.isEmpty || contact.isEmpty) {
       throw Exception("Nom et contact obligatoires");
     }
@@ -100,7 +97,6 @@ class Gestionnaire {
     required String statut,
     required String contact,
   }) async {
-
     if (id <= 0) {
       throw Exception("ID client invalide");
     }
@@ -132,7 +128,6 @@ class Gestionnaire {
   // SUPPRESSION CLIENT
   // =========================
   static Future<void> supprimerClient(int id) async {
-
     if (id <= 0) {
       throw Exception("ID client invalide");
     }

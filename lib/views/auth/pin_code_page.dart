@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../main_screen.dart'; // Import corrigé pour pointer vers la racine des views
+import '../../controllers/gestionnaire.dart'; // Importez le backend
+import '../main_screen.dart';
 
 class PinCodePage extends StatefulWidget {
   final String userName;
@@ -10,18 +11,35 @@ class PinCodePage extends StatefulWidget {
 
 class _PinCodePageState extends State<PinCodePage> {
   String code = "";
+  bool _isLoading = false;
 
-  void _onKeyPress(String value) {
+  void _onKeyPress(String value) async {
     if (code.length < 6) {
       setState(() => code += value);
     }
-    // Simulation : redirection vers MainScreen une fois le code à 6 chiffres entré
-    if (code.length == 6) {
-      Navigator.pushAndRemoveUntil(
-        context, 
-        MaterialPageRoute(builder: (_) => const MainScreen()), 
-        (route) => false
-      );
+
+    // Une fois le code à 6 chiffres entré, on enregistre
+    if (code.length == 6 && !_isLoading) {
+      setState(() => _isLoading = true);
+
+      try {
+        // Enregistrement dans la BDD (Le code PIN sert de mot de passe)
+        await Gestionnaire.enregistrerGestionnaire(code);
+
+        if (mounted) {
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (_) => const MainScreen()),
+              (route) => false);
+        }
+      } catch (e) {
+        setState(() {
+          code = ""; // Reset en cas d'erreur
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Erreur inscription: $e")));
+      }
     }
   }
 
@@ -34,7 +52,7 @@ class _PinCodePageState extends State<PinCodePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFEDE2D0), // Couleur spécifique demandée
+      backgroundColor: const Color(0xFFEDE2D0),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -45,71 +63,80 @@ class _PinCodePageState extends State<PinCodePage> {
       ),
       body: Stack(
         children: [
-          // Logo en filigrane
-          Center(child: Opacity(opacity: 0.05, child: Image.asset('assets/logo.png', width: 300))),
-          
-          Column(
-            children: [
-              const SizedBox(height: 20),
-              // TITRE DYNAMIQUE
-              RichText(
-                text: TextSpan(
-                  style: const TextStyle(fontSize: 32, color: Colors.black),
-                  children: [
-                    const TextSpan(text: "Bonjour ", style: TextStyle(fontWeight: FontWeight.bold)),
-                    TextSpan(text: "${widget.userName},", style: const TextStyle(fontWeight: FontWeight.normal)),
-                  ],
+          Center(
+              child: Opacity(
+                  opacity: 0.05,
+                  child: Image.asset('assets/logo.png', width: 300))),
+          if (_isLoading)
+            const Center(child: CircularProgressIndicator())
+          else
+            Column(
+              children: [
+                const SizedBox(height: 20),
+                RichText(
+                  text: TextSpan(
+                    style: const TextStyle(fontSize: 32, color: Colors.black),
+                    children: [
+                      const TextSpan(
+                          text: "Bonjour ",
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      TextSpan(
+                          text: "${widget.userName},",
+                          style:
+                              const TextStyle(fontWeight: FontWeight.normal)),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 50),
-              
-              const Text("Entrer le code d’accès rapide.", style: TextStyle(color: Colors.red, fontSize: 16)),
-              const SizedBox(height: 30),
-
-              // BULLES CODE PIN
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(6, (index) {
-                  return Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 8),
-                    width: 20, height: 20,
-                    decoration: BoxDecoration(
-                      color: index < code.length ? const Color(0xFF4A4A4A) : const Color(0xFF4A4A4A).withOpacity(0.3),
-                      shape: BoxShape.circle,
-                    ),
-                  );
-                }),
-              ),
-              
-              const Spacer(),
-              
-              // CLAVIER NUMÉRIQUE
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 40),
-                child: Column(
-                  children: [
-                    _buildRow("7", "8", "9"),
-                    const SizedBox(height: 20),
-                    _buildRow("4", "5", "6"),
-                    const SizedBox(height: 20),
-                    _buildRow("1", "2", "3"),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        const Icon(Icons.fingerprint, size: 50, color: Colors.black),
-                        _buildBtn("0"),
-                        IconButton(
-                          icon: const Icon(Icons.backspace_outlined, size: 30),
-                          onPressed: _onDelete,
-                        ),
-                      ],
-                    ),
-                  ],
+                const SizedBox(height: 50),
+                const Text("Entrez votre code d’accès rapide (6 chiffres).",
+                    style: TextStyle(color: Colors.red, fontSize: 16)),
+                const SizedBox(height: 30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(6, (index) {
+                    return Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 8),
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: index < code.length
+                            ? const Color(0xFF4A4A4A)
+                            : const Color(0xFF4A4A4A).withOpacity(0.3),
+                        shape: BoxShape.circle,
+                      ),
+                    );
+                  }),
                 ),
-              )
-            ],
-          ),
+                const Spacer(),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 40),
+                  child: Column(
+                    children: [
+                      _buildRow("7", "8", "9"),
+                      const SizedBox(height: 20),
+                      _buildRow("4", "5", "6"),
+                      const SizedBox(height: 20),
+                      _buildRow("1", "2", "3"),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          const Icon(Icons.fingerprint,
+                              size: 50, color: Colors.black),
+                          _buildBtn("0"),
+                          IconButton(
+                            icon:
+                                const Icon(Icons.backspace_outlined, size: 30),
+                            onPressed: _onDelete,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
         ],
       ),
     );
@@ -127,7 +154,8 @@ class _PinCodePageState extends State<PinCodePage> {
       onPressed: () => _onKeyPress(val),
       child: Text(
         val,
-        style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.black),
+        style: const TextStyle(
+            fontSize: 32, fontWeight: FontWeight.bold, color: Colors.black),
       ),
     );
   }

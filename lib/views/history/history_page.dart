@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
+import '../../database/database_helper.dart';
 import '../../models/history_model.dart';
 import 'widgets/history_item.dart';
+
+class DisplayHistoryItem {
+  final String lib;
+  final String type;
+  final String date;
+  DisplayHistoryItem(
+      {required this.lib, required this.type, required this.date});
+}
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -10,76 +19,71 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
-  // Données fictives basées sur votre image "historique.png"
-  final List<HistoryModel> mockHistory = [
-    HistoryModel(
-      id: 1,
-      type: "Ajout",
-      titre: "Ajout de client",
-      description: "Nom: Norbert",
-      date: "10/11/2025   12:30",
-    ),
-    HistoryModel(
-      id: 2,
-      type: "Modification",
-      titre: "Mise à jour de statut",
-      description: "Neutre --> Fidèle",
-      date: "10/11/2025   12:30",
-    ),
-    HistoryModel(
-      id: 3,
-      type: "Modification",
-      titre: "Mise à jour de Client",
-      description: "Modification des informations du client",
-      date: "10/11/2025   12:30",
-    ),
-    HistoryModel(
-      id: 4,
-      type: "Suppression",
-      titre: "Suppression de client",
-      description: "Nom: Norbert",
-      date: "10/11/2025   12:30",
-    ),
-    HistoryModel(
-      id: 5,
-      type: "Ajout",
-      titre: "Ajout de client",
-      description: "Nom: Norbert",
-      date: "10/11/2025   12:30",
-    ),
-  ];
+  Future<List<DisplayHistoryItem>> _fetchHistory() async {
+    final db = await DatabaseHelper.instance.database;
+    final List<Map<String, dynamic>> rawData = await HistoriqueModel.getAll(db);
+    return rawData
+        .map((map) => DisplayHistoryItem(
+              lib: map['lib'] ?? '',
+              type: map['type'] ?? '',
+              date: map['date'] ?? '',
+            ))
+        .toList();
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Si la liste est vide (pour tester l'écran vide "historique alternatif")
-    if (mockHistory.isEmpty) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.history_toggle_off, size: 100, color: Colors.black12),
-            SizedBox(height: 20),
-            Text(
-              "Aucun historique pour le moment",
-              style: TextStyle(color: Colors.grey, fontSize: 16),
-            ),
-          ],
-        ),
-      );
-    }
-
-    // Liste normale
+    // Fond global beige identique à la liste des clients
     return Container(
-      color: const Color(0xFFFDFBF7), // Fond crème global
-      child: ListView.builder(
-        // Padding top pour laisser la place au Header du MainScreen (Barre recherche)
-        // Padding bottom pour la Nav Bar
-        padding: const EdgeInsets.only(top: 100, left: 16, right: 16, bottom: 100),
-        itemCount: mockHistory.length,
-        itemBuilder: (context, index) {
-          return HistoryItem(history: mockHistory[index]);
+      color: const Color(0xFFE8D6BF),
+      child: FutureBuilder<List<DisplayHistoryItem>>(
+        future: _fetchHistory(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            // État vide (historique alternatif.png)
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(Icons.file_copy_outlined,
+                      size: 80, color: Colors.black26),
+                  SizedBox(height: 20),
+                  Text("Vous n'avez pas encore\nd'historique enregistré.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.black45, fontSize: 16)),
+                ],
+              ),
+            );
+          }
+
+          final historyList = snapshot.data!;
+          return ListView.builder(
+            // Padding pour passer sous le header MainScreen (Recherche)
+            padding: const EdgeInsets.only(
+                top: 20, left: 16, right: 16, bottom: 100),
+            itemCount: historyList.length,
+            itemBuilder: (context, index) {
+              final item = historyList[index];
+              return HistoryItem(
+                titre: _formatTitle(item.type),
+                description: item.lib,
+                date: item.date,
+              );
+            },
+          );
         },
       ),
     );
+  }
+
+  String _formatTitle(String type) {
+    if (type == 'AJOUT') return "Ajout de client";
+    if (type == 'MODIFICATION')
+      return "Mise à jour de client"; // ou "Mise à jour de statut" selon contenu
+    if (type == 'SUPPRESSION') return "Suppression de client";
+    return type;
   }
 }

@@ -1,15 +1,32 @@
-class HistoryModel {
-  final int? id;
-  final String type; // "Ajout", "Modification", "Suppression"
-  final String titre; // Ex: "Ajout de client"
-  final String description; // Ex: "Nom: Norbert" ou "Neutre -> Fidèle"
-  final String date; // Ex: "10/11/2025 12:30"
+class HistoriqueModel {
 
-  HistoryModel({
-    this.id,
-    required this.type,
-    required this.titre,
-    required this.description,
-    required this.date,
-  });
+  /// ======================
+  /// AJOUT D’UN ÉVÉNEMENT
+  /// ======================
+  static Future<int> addHistorique(
+    db,
+    String lib,
+    String type,
+    String date,
+  ) async {
+    return await db.rawInsert(
+      '''
+      INSERT INTO historiques (lib, type, date)
+      VALUES (?, ?, ?)
+      ''',
+      [lib, type, date],
+    );
+  }
+
+  /// ======================
+  /// LISTER HISTORIQUES
+  /// ======================
+  static Future<List<Map<String, dynamic>>> getAll(db) async {
+    return await db.rawQuery(
+      '''
+      SELECT * FROM historiques
+      ORDER BY date DESC
+      '''
+    );
+  }
 }

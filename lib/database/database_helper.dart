@@ -2,7 +2,6 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseHelper {
-
   static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _database;
 
@@ -26,18 +25,14 @@ class DatabaseHelper {
   }
 
   Future<void> _createDB(Database db, int version) async {
-
-    await db.execute(
-      '''
+    await db.execute('''
       CREATE TABLE gestionnaires (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         mdp TEXT NOT NULL
       )
-      '''
-    );
+      ''');
 
-    await db.execute(
-      '''
+    await db.execute('''
       CREATE TABLE clients (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nom TEXT NOT NULL,
@@ -45,21 +40,17 @@ class DatabaseHelper {
         statut TEXT NOT NULL,
         contact TEXT NOT NULL
       )
-      '''
-    );
+      ''');
 
-    await db.execute(
-      '''
+    await db.execute('''
       CREATE TABLE historiques (
         idhist INTEGER PRIMARY KEY AUTOINCREMENT,
         lib TEXT NOT NULL,
         type TEXT NOT NULL,
         date TEXT NOT NULL
       )
-      '''
-    );
+      ''');
   }
-
 
   Future<void> close() async {
     final db = await database;

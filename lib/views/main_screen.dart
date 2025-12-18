@@ -14,124 +14,199 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = [
-    const ClientsListPage(), // Accueil (Liste)
-    const Center(child: Text("Action")), // Placeholder bouton +
-    const HistoryPage(), // Historique
-  ];
+  // --- VARIABLES D'ÉTAT (Recherche, Tri, Filtre) ---
+  String _searchQuery = "";
+  bool _sortAscending = true;
+  String _filterStatus = "Tous"; // <--- CETTE VARIABLE DOIT ÊTRE DÉFINIE ICI
+
+  // Construction dynamique de la page
+  Widget _buildBody() {
+    switch (_currentIndex) {
+      case 0:
+        // On passe le filtre à la liste des clients
+        return ClientsListPage(
+          searchQuery: _searchQuery,
+          sortAscending: _sortAscending,
+          filterStatus:
+              _filterStatus, // <--- Utilise la variable définie plus haut
+        );
+      case 2:
+        return const HistoryPage();
+      default:
+        return const SizedBox();
+    }
+  }
+
+  // Menu pour choisir le filtre
+  void _showFilterMenu(BuildContext context) async {
+    final String? selected = await showMenu<String>(
+      context: context,
+      position: const RelativeRect.fromLTRB(100, 140, 20, 0),
+      color: const Color(0xFFF3E9DD),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      items: [
+        const PopupMenuItem(value: "Tous", child: Text("Tous les statuts")),
+        const PopupMenuItem(value: "Fidèle", child: Text("Fidèle")),
+        const PopupMenuItem(value: "Neutre", child: Text("Neutre")),
+        const PopupMenuItem(value: "Occasionnel", child: Text("Occasionnel")),
+      ],
+    );
+
+    if (selected != null) {
+      setState(() {
+        _filterStatus = selected; // Mise à jour de la variable
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE8D6BF), // Fond Beige Global
+      backgroundColor: const Color(0xFFE8D6BF),
 
-      // --- HEADER PERSONNALISÉ (2 LIGNES) ---
-      appBar: PreferredSize(
-        preferredSize:
-            const Size.fromHeight(130), // Hauteur augmentée pour 2 lignes
-        child: SafeArea(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            color: const Color(0xFFE8D6BF), // Fond beige header
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                // LIGNE 1 : Logo + Menu
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Logo
-                    Row(
-                      children: [
-                        Image.asset('assets/logo.png',
-                            height: 35,
-                            errorBuilder: (c, e, s) => const Icon(
-                                Icons.flash_on,
-                                color: Color(0xFF1A3B6E),
-                                size: 35)),
-                        // Si vous avez le texte dans l'image logo, retirez ce Text widget
-                        // const SizedBox(width: 5),
-                        // const Text("Fast CRM", style: TextStyle(fontFamily: 'Arial', fontWeight: FontWeight.bold, color: Color(0xFF1A3B6E), fontSize: 20)),
-                      ],
-                    ),
-                    // Menu Hamburger (Bleu foncé, traits épais)
-                    const Icon(Icons.menu, size: 35, color: Color(0xFF1A3B6E)),
-                  ],
-                ),
-
-                const SizedBox(height: 15),
-
-                // LIGNE 2 : Recherche + Tri + Filtre
-                Row(
-                  children: [
-                    // Barre de Recherche
-                    Expanded(
-                      child: Container(
-                        height: 45,
-                        decoration: BoxDecoration(
-                          color:
-                              const Color(0xFFEFE6DD), // Beige très clair/Grisé
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                        child: const TextField(
-                          decoration: InputDecoration(
-                            hintText: "Recherche",
-                            hintStyle: TextStyle(color: Colors.grey),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 12),
-                            suffixIcon:
-                                Icon(Icons.search, color: Colors.black54),
-                          ),
-                        ),
+      // AppBar visible seulement sur l'accueil (index 0)
+      appBar: _currentIndex == 0
+          ? PreferredSize(
+              preferredSize: const Size.fromHeight(130),
+              child: SafeArea(
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  color: const Color(0xFFE8D6BF),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      // LIGNE 1 : Logo (Burger supprimé)
+                      Row(
+                        children: [
+                          Image.asset('assets/logo.png',
+                              height: 35,
+                              errorBuilder: (c, e, s) => const Icon(
+                                  Icons.flash_on,
+                                  color: Color(0xFF1A3B6E),
+                                  size: 35)),
+                        ],
                       ),
-                    ),
-                    const SizedBox(width: 10),
 
-                    // Bouton Tri (Flèche bas)
-                    _buildHeaderButton(Icons.sort), // Ou Icons.swap_vert
+                      const SizedBox(height: 15),
 
-                    const SizedBox(width: 10),
+                      // LIGNE 2 : Recherche + Tri + Filtre
+                      Row(
+                        children: [
+                          // Barre de Recherche
+                          Expanded(
+                            child: Container(
+                              height: 45,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEFE6DD),
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                              child: TextField(
+                                onChanged: (value) {
+                                  setState(() => _searchQuery = value);
+                                },
+                                decoration: const InputDecoration(
+                                  hintText: "Recherche",
+                                  hintStyle: TextStyle(color: Colors.grey),
+                                  border: InputBorder.none,
+                                  contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 12),
+                                  suffixIcon:
+                                      Icon(Icons.search, color: Colors.black54),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
 
-                    // Bouton Filtre (Entonnoir)
-                    _buildHeaderButton(Icons.filter_alt_outlined),
-                  ],
+                          // Bouton Tri
+                          GestureDetector(
+                            onTap: () {
+                              setState(() => _sortAscending = !_sortAscending);
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(SnackBar(
+                                content: Text(
+                                    _sortAscending ? "Tri : A-Z" : "Tri : Z-A"),
+                                duration: const Duration(milliseconds: 500),
+                                backgroundColor: const Color(0xFF1A3B6E),
+                              ));
+                            },
+                            child: Container(
+                              width: 45,
+                              height: 45,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFEFE6DD),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                  _sortAscending
+                                      ? Icons.arrow_downward
+                                      : Icons.arrow_upward,
+                                  color: Colors.black87,
+                                  size: 24),
+                            ),
+                          ),
+
+                          const SizedBox(width: 10),
+
+                          // Bouton Filtre (Fonctionnel)
+                          GestureDetector(
+                            onTap: () => _showFilterMenu(context),
+                            child: Container(
+                              width: 45,
+                              height: 45,
+                              decoration: BoxDecoration(
+                                // Change de couleur si un filtre est actif
+                                color: _filterStatus == "Tous"
+                                    ? const Color(0xFFEFE6DD)
+                                    : const Color(0xFF1A3B6E),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(Icons.filter_alt_outlined,
+                                  // Change d'icone/couleur si actif
+                                  color: _filterStatus == "Tous"
+                                      ? Colors.black87
+                                      : Colors.white,
+                                  size: 24),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-          ),
-        ),
-      ),
+              ),
+            )
+          : null,
 
-      body: _pages[_currentIndex],
+      body: _buildBody(),
 
-      // --- NAVIGATION BAR COURBE ---
       bottomNavigationBar: Container(
-        height: 85, // Hauteur ajustée
+        height: 85,
         decoration: const BoxDecoration(
-          color: Color(0xFFD4C1A5), // Beige foncé navigation
+          color: Color(0xFFD4C1A5),
           borderRadius: BorderRadius.only(
               topLeft: Radius.circular(35), topRight: Radius.circular(35)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            // Onglet Accueil
             _buildNavItem(
-                icon: Icons.home_outlined,
-                label: "Accueil",
-                isSelected: _currentIndex == 0,
-                onTap: () => setState(() => _currentIndex = 0)),
+                icon: Icons.home_outlined, label: "Accueil", index: 0),
 
-            // GROS BOUTON "+"
+            // Bouton Ajout (Actualise au retour)
             GestureDetector(
-              onTap: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => const ClientFormPage())),
+              onTap: () async {
+                await Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const ClientFormPage()));
+                setState(() {}); // Rafraîchissement
+              },
               child: Container(
-                width: 65, height: 65,
-                margin: const EdgeInsets.only(bottom: 10), // Remonte légèrement
+                width: 65,
+                height: 65,
+                margin: const EdgeInsets.only(bottom: 10),
                 decoration: const BoxDecoration(
-                    color: Color(0xFF1A3B6E), // Bleu Nuit
+                    color: Color(0xFF1A3B6E),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
@@ -143,53 +218,26 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
 
-            // Onglet Historique
-            _buildNavItem(
-                icon: Icons
-                    .history, // Ou Icons.assignment_outlined pour ressembler à l'icone dossier/horloge
-                label: "Historique",
-                isSelected: _currentIndex == 2,
-                onTap: () => setState(() => _currentIndex = 2)),
+            _buildNavItem(icon: Icons.history, label: "Historique", index: 2),
           ],
         ),
       ),
     );
   }
 
-  // Widget pour les petits boutons ronds du header (Filtre/Tri)
-  Widget _buildHeaderButton(IconData icon) {
-    return Container(
-      width: 45,
-      height: 45,
-      decoration: const BoxDecoration(
-        color: Color(0xFFEFE6DD), // Même couleur que la barre de recherche
-        shape: BoxShape.circle,
-      ),
-      child: Icon(icon, color: Colors.black87, size: 24),
-    );
-  }
-
-  // Widget pour les items de navigation (Icône + Texte)
   Widget _buildNavItem(
-      {required IconData icon,
-      required String label,
-      required bool isSelected,
-      required VoidCallback onTap}) {
+      {required IconData icon, required String label, required int index}) {
+    bool isSelected = _currentIndex == index;
     return GestureDetector(
-      onTap: onTap,
+      onTap: () => setState(() => _currentIndex = index),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            padding: const EdgeInsets.all(5),
-            // Petit fond si sélectionné (optionnel, pour faire ressortir)
-            // decoration: isSelected ? BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(10)) : null,
-            child: Icon(icon,
-                size: 30,
-                color: isSelected
-                    ? const Color(0xFF1A3B6E)
-                    : const Color(0xFF1A3B6E).withOpacity(0.5)),
-          ),
+          Icon(icon,
+              size: 30,
+              color: isSelected
+                  ? const Color(0xFF1A3B6E)
+                  : const Color(0xFF1A3B6E).withOpacity(0.5)),
           Text(label,
               style: TextStyle(
                   fontSize: 12,

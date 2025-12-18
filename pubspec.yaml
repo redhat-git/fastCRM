@@ -11,7 +11,9 @@ dependencies:
   sqflite: ^2.3.0
   path: ^1.9.0
   crypto: ^3.0.3
-
+  url_launcher: ^6.2.4  # Pour ouvrir Téléphone et Mail
+  local_auth: ^2.1.8    # Pour l'empreinte digitale
+  shared_preferences: ^2.2.2
 
   # Icônes style iOS (standard Flutter)
   cupertino_icons: ^1.0.8
